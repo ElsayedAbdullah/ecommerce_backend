@@ -1,0 +1,28 @@
+/*
+----------
+// register
+----------
+*/
+// data from request
+// check user existence
+// hash password
+// generate activationCode
+// create user
+// create confirmationLink
+// send email
+// send response
+
+/*
+ * * * * * * * *  
+-----------------
+ * * * * * * * *
+*/
+
+/*
+---------------------
+// confirmation email
+---------------------
+*/
+// find user, delete activationCode, update isConfirmed
+// check if the user doesn't exist
+// send response
