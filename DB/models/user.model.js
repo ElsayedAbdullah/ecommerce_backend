@@ -1,5 +1,6 @@
 import mongoose, { Schema, model } from "mongoose";
 
+// Schema
 const userSchema = new Schema(
   {
     userName: {
@@ -10,9 +11,9 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
+      unique: true,
       required: true,
       lowercase: true,
-      unique: true,
     },
     password: {
       type: String,
@@ -69,6 +70,7 @@ const userSchema = new Schema(
   }
 );
 
-const userModel = mongoose.models.userModel || model("User", userSchema);
+// Model
+const User = mongoose.models.User || model("User", userSchema);
 
-export default userModel;
+export default User;

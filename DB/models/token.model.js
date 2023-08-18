@@ -1,4 +1,4 @@
-import mongoose, { Schema, model } from "mongoose";
+import mongoose, { Schema, Types, model } from "mongoose";
 
 // Schema
 const tokenSchema = new Schema(
@@ -22,5 +22,5 @@ const tokenSchema = new Schema(
 );
 
 // Model
-const tokenModel = mongoose.models.tokenModel || model("Token", tokenSchema);
-export default tokenModel;
+const Token = mongoose.models.Token || model("Token", tokenSchema);
+export default Token;

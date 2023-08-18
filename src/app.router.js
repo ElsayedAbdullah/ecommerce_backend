@@ -1,15 +1,16 @@
 import connectDB from "../DB/connection.js";
-import authRouter from "./modules/user/user.router.js";
+import authRouter from "./modules/auth/auth.router.js";
 
 const appRouter = (app, express) => {
   // Global middleware
   app.use(express.json());
 
   // Routes
+  // auth
   app.use("/auth", authRouter);
 
   // not found page router
-  app.use("*", (req, res, next) => {
+  app.all("*", (req, res, next) => {
     return next(new Error("Page not found", { cause: 404 }));
   });
 
