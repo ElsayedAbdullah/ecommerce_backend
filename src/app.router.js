@@ -1,5 +1,6 @@
 import connectDB from "../DB/connection.js";
 import authRouter from "./modules/auth/auth.router.js";
+import categoryRouter from "./modules/category/category.router.js";
 
 const appRouter = (app, express) => {
   // Global middleware
@@ -9,9 +10,12 @@ const appRouter = (app, express) => {
   // auth
   app.use("/auth", authRouter);
 
+  // category
+  app.use("/category", categoryRouter);
+
   // not found page router
   app.all("*", (req, res, next) => {
-    return next(new Error("Page not found", { cause: 404 }));
+    return next(new Error("Page not found"));
   });
 
   // global error handler

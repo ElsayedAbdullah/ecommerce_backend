@@ -8,7 +8,7 @@ export const isValid = (Schema) => {
         (error) => error.message
       );
 
-      return next(new Error(messages), { cause: 400 });
+      return next(new Error(messages));
     }
 
     return next();

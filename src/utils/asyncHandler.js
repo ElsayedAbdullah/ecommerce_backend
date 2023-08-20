@@ -3,5 +3,6 @@ export const asyncHandler = (controller) => {
     controller(req, res, next).catch((err) => {
       return next(err);
     });
+    return next();
   };
 };

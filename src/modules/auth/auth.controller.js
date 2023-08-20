@@ -18,7 +18,7 @@ export const register = asyncHandler(async (req, res, next) => {
 
   // check user existence
   const isUser = await User.findOne({ email });
-  if (isUser) return next(new Error("Email already exists"), { cause: 409 });
+  if (isUser) return next(new Error("Email already exists"));
 
   // hash password
   const hashPassword = bcryptjs.hashSync(
@@ -49,7 +49,7 @@ export const register = asyncHandler(async (req, res, next) => {
 
   // send response
   return isSent
-    ? res.json({ success: true, message: "please review your email" })
+    ? res.json({ success: true, message: "check your email" })
     : next(new Error("something went wrong!"));
 });
 
@@ -63,7 +63,7 @@ export const confirmEmail = asyncHandler(async (req, res, next) => {
   );
 
   // check if the user doesn't exist
-  if (!user) return next(new Error("user not found!"), { cause: 404 });
+  if (!user) return next(new Error("user not found!"));
 
   // create a cart
 
@@ -81,15 +81,14 @@ export const login = asyncHandler(async (req, res, next) => {
   // check user existence
 
   const user = await User.findOne({ email });
-  if (!user) return next(new Error("Invalid Email", { cause: 400 }));
+  if (!user) return next(new Error("Invalid Email"));
 
   // check is confirmed
-  if (!user.isConfirmed)
-    return next(new Error("inactivated account", { cause: 400 }));
+  if (!user.isConfirmed) return next(new Error("inactivated account"));
 
   // check password
   const match = bcryptjs.compareSync(password, user.password);
-  if (!match) return next(new Error("Invalid Password", { cause: 400 }));
+  if (!match) return next(new Error("Invalid Password"));
 
   // generate Token
   const token = jwt.sign(
@@ -120,7 +119,7 @@ export const login = asyncHandler(async (req, res, next) => {
 export const forgetCode = asyncHandler(async (req, res, next) => {
   //  check user
   const user = await User.findOne({ email: req.body.email });
-  if (!user) return next(new Error("Invalid Email", { cause: 400 }));
+  if (!user) return next(new Error("Invalid Email"));
 
   // generate code
   const code = randomstring.generate({
