@@ -1,3 +1,11 @@
+import { Types } from "mongoose";
+
+export const isValidObjectId = (value, helper) => {
+  return Types.ObjectId.isValid(value)
+    ? true
+    : helper.message("Invalid ObjectId");
+};
+
 export const isValid = (Schema) => {
   return (req, res, next) => {
     const reqValues = { ...req.query, ...req.body, ...req.params };
