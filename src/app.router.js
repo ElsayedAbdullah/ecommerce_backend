@@ -1,6 +1,7 @@
 import connectDB from "../DB/connection.js";
 import authRouter from "./modules/auth/auth.router.js";
 import categoryRouter from "./modules/category/category.router.js";
+import subcategoryRouter from "./modules/subcategory/subcategory.router.js";
 
 const appRouter = (app, express) => {
   // Global middleware
@@ -12,6 +13,9 @@ const appRouter = (app, express) => {
 
   // category
   app.use("/category", categoryRouter);
+
+  // subcategory
+  app.use("/subcategory", subcategoryRouter);
 
   // not found page router
   app.all("*", (req, res, next) => {

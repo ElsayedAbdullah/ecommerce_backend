@@ -1,15 +1,12 @@
 import bcryptjs from "bcryptjs";
+
 import crypto from "crypto";
+import jwt from "jsonwebtoken";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { sendEmail } from "../../utils/sendEmail.js";
-import {
-  resetPasswordTemp,
-  signupEmailTemp,
-} from "../../utils/emailTemplate.js";
+import { signupEmailTemp } from "../../utils/emailTemplate.js";
 import User from "../../../DB/models/user.model.js";
 import Token from "../../../DB/models/token.model.js";
-import jwt from "jsonwebtoken";
-import randomstring from "randomstring";
 
 // Register
 export const register = asyncHandler(async (req, res, next) => {
@@ -18,7 +15,7 @@ export const register = asyncHandler(async (req, res, next) => {
 
   // check user existence
   const isUser = await User.findOne({ email });
-  if (isUser) return next(new Error("Email already exists"));
+  if (isUser) return next(new Error("Email already exists"), { cause: 409 });
 
   // hash password
   const hashPassword = bcryptjs.hashSync(
@@ -49,7 +46,7 @@ export const register = asyncHandler(async (req, res, next) => {
 
   // send response
   return isSent
-    ? res.json({ success: true, message: "check your email" })
+    ? res.json({ success: true, message: "please review your email" })
     : next(new Error("something went wrong!"));
 });
 
@@ -63,7 +60,7 @@ export const confirmEmail = asyncHandler(async (req, res, next) => {
   );
 
   // check if the user doesn't exist
-  if (!user) return next(new Error("user not found!"));
+  if (!user) return next(new Error("user not found!"), { cause: 404 });
 
   // create a cart
 

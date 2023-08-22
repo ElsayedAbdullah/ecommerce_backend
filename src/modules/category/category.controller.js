@@ -77,6 +77,9 @@ export const deleteCategory = asyncHandler(async (req, res, next) => {
 
 // get all categories
 export const allCategories = asyncHandler(async (req, res, next) => {
-  const categories = await Category.find();
+  const categories = await Category.find().populate({
+    path: "subcategories",
+    populate: [{ path: "createdBy" }], // nested populate
+  });
   return res.json({ success: true, result: categories });
 });

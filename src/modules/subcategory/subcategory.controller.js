@@ -37,3 +37,66 @@ export const createSubcategory = asyncHandler(async (req, res, next) => {
   // send response
   return res.json({ success: true, results: subcategory });
 });
+
+// update subcategory
+export const updateSubcategory = asyncHandler(async (req, res, next) => {
+  // check category
+  const category = await Category.findById(req.params.categoryId);
+  if (!category) return next(new Error("Category not found!", { cause: 404 }));
+
+  // check subcategory
+  const subcategory = await Subcategory.findById(req.params.subcategoryId);
+  if (!subcategory)
+    return next(new Error("Subcategory not found!", { cause: 404 }));
+
+  subcategory.name = req.body.name ? req.body.name : subcategory.name;
+  subcategory.slug = req.body.name ? slugify(req.body.name) : subcategory.slug;
+
+  // file
+  if (req.file) {
+    const { secure_url } = await cloudinary.uploader.upload(req.file.path, {
+      public_id: subcategory.image.id,
+    });
+    subcategory.image.url = secure_url;
+  }
+
+  await subcategory.save();
+
+  return res.json({
+    success: true,
+    message: "Subcategory updated successfully!",
+    results: subcategory,
+  });
+});
+
+// delete subcategory
+export const deleteSubcategory = asyncHandler(async (req, res, next) => {
+  // check category
+  const category = await Category.findById(req.params.categoryId);
+  if (!category) return next(new Error("Category not found!", { cause: 404 }));
+
+  // check subcategory and delete
+  const subcategory = await Subcategory.findByIdAndDelete(
+    req.params.subcategoryId
+  );
+  if (!subcategory)
+    return next(new Error("Subcategory not found!", { cause: 404 }));
+
+  return res.json({
+    success: true,
+    message: "Subcategory deleted successfully!",
+  });
+});
+
+// get all subcategories
+export const getAllSubcategories = asyncHandler(async (req, res, next) => {
+  const subcategories = await Subcategory.find().populate([
+    {
+      path: "categoryId",
+    },
+    {
+      path: "createdBy",
+    },
+  ]);
+  return res.json({ success: true, result: subcategories });
+});
