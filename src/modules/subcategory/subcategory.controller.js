@@ -45,9 +45,18 @@ export const updateSubcategory = asyncHandler(async (req, res, next) => {
   if (!category) return next(new Error("Category not found!", { cause: 404 }));
 
   // check subcategory
-  const subcategory = await Subcategory.findById(req.params.subcategoryId);
+  const subcategory = await Subcategory.findOne({
+    _id: req.params.subcategoryId,
+    categoryId: req.params.categoryId,
+  });
+
   if (!subcategory)
     return next(new Error("Subcategory not found!", { cause: 404 }));
+
+  // check owner
+  if (req.user._id.toString() !== subcategory.createdBy.toString()) {
+    return next(new Error("You are not the owner!", { cause: 404 }));
+  }
 
   subcategory.name = req.body.name ? req.body.name : subcategory.name;
   subcategory.slug = req.body.name ? slugify(req.body.name) : subcategory.slug;
@@ -75,12 +84,18 @@ export const deleteSubcategory = asyncHandler(async (req, res, next) => {
   const category = await Category.findById(req.params.categoryId);
   if (!category) return next(new Error("Category not found!", { cause: 404 }));
 
-  // check subcategory and delete
-  const subcategory = await Subcategory.findByIdAndDelete(
-    req.params.subcategoryId
-  );
+  // check subcategory and delete subcategory is a child of the same category
+  const subcategory = await Subcategory.findOneAndDelete({
+    _id: req.params.subcategoryId,
+    categoryId: req.params.categoryId,
+  });
   if (!subcategory)
     return next(new Error("Subcategory not found!", { cause: 404 }));
+
+  // check owner
+  if (req.user._id.toString() !== subcategory.createdBy.toString()) {
+    return next(new Error("You are not the owner!", { cause: 404 }));
+  }
 
   return res.json({
     success: true,

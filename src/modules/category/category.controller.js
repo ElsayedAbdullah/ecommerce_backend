@@ -2,6 +2,7 @@ import Category from "../../../DB/models/category.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import slugify from "slugify";
 import cloudinary from "../../utils/cloud.js";
+import { Subcategory } from "../../../DB/models/subcategory.model.js";
 
 // CRUD
 
@@ -34,6 +35,11 @@ export const updateCategory = asyncHandler(async (req, res, next) => {
   const category = await Category.findById(req.params.categoryId);
   if (!category) return next(new Error("Category not found"));
 
+  // check owner
+  if (req.user._id.toString() !== category.createdBy.toString()) {
+    return next(new Error("You are not the owner!", { cause: 404 }));
+  }
+
   // update name
   category.name = req.body.name ? req.body.name : category.name;
 
@@ -62,11 +68,19 @@ export const deleteCategory = asyncHandler(async (req, res, next) => {
   const category = await Category.findById(req.params.categoryId);
   if (!category) return next(new Error("Invalid category Id"));
 
+  // check owner
+  if (req.user._id.toString() !== category.createdBy.toString()) {
+    return next(new Error("You are not the owner!", { cause: 404 }));
+  }
+
   // remove the image of category from cloudinary
   const result = await cloudinary.uploader.destroy(category.image.id);
 
   // delete category from database
   await Category.findByIdAndDelete(req.params.categoryId);
+
+  // delete all subcategories for this category
+  await Subcategory.deleteMany({ categoryId: req.params.categoryId });
 
   // send response
   return res.json({

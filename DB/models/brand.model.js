@@ -1,7 +1,7 @@
 import mongoose, { Schema, Types, model } from "mongoose";
 
 // Schema
-const categorySchema = new Schema(
+const brandSchema = new Schema(
   {
     name: {
       type: String,
@@ -26,21 +26,11 @@ const categorySchema = new Schema(
       ref: "User",
       required: true,
     },
-    brandId: {
-      type: Types.ObjectId,
-      ref: "Brand",
-    },
   },
-  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+  { timestamps: true }
 );
 
-categorySchema.virtual("subcategories", {
-  ref: "Subcategory",
-  localField: "_id",
-  foreignField: "categoryId",
-});
-
 // Model
-const Category = mongoose.models.Category || model("Category", categorySchema);
+const Brand = mongoose.models.Brand || model("Brand", brandSchema);
 
-export default Category;
+export default Brand;
