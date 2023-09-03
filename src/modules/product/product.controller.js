@@ -2,9 +2,25 @@ import { Product } from "../../../DB/models/product.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { nanoid } from "nanoid";
 import cloudinary from "../../utils/cloud.js";
+import Category from "../../../DB/models/category.model.js";
+import { Subcategory } from "../../../DB/models/subcategory.model.js";
+import Brand from "../../../DB/models/brand.model.js";
 
 // create product
 export const createProduct = asyncHandler(async (req, res, next) => {
+  // check category
+  const category = await Category.findById(req.body.category);
+  if (!category) return next(new Error("Category not found", { cause: 404 }));
+
+  // check subcategory
+  const subcategory = await Subcategory.findById(req.body.subcategory);
+  if (!subcategory)
+    return next(new Error("Subcategory not found", { cause: 404 }));
+
+  // check brand
+  const brand = await Brand.findById(req.body.brand);
+  if (!brand) return next(new Error("Brand not found", { cause: 404 }));
+
   // create unique cloud folder
   const cloudFolder = nanoid();
   let images = [];
@@ -75,28 +91,71 @@ export const deleteProduct = asyncHandler(async (req, res, next) => {
 
 // get all products
 export const allProducts = asyncHandler(async (req, res, next) => {
-  // all products
+  if (req.params.categoryId) {
+    // check category
+    const category = await Category.findById(req.params.categoryId);
+    if (!category) return next(new Error("Category not found"));
+
+    const products = await Product.find({
+      category: req.params.categoryId,
+    });
+    return res.json({ success: true, results: products });
+  }
+  // ********** get all products ********* \\
   // const products = await Product.find();
 
-  // search by name
-  // const searchedProducts = await Product.find({
-  //   name: { $regex: req.query.name },
+  // ********** Search ********* \\
+  // to search in more than one field using $or operator and also make the search case insensitive with $options operator
+  // let keyword = req.query.keyword;
+  // keyword = !keyword ? "" : keyword;
+  // console.log(keyword);
+  // const products = await Product.find({
+  //   $or: [
+  //     { name: { $regex: keyword, $options: "i" } },
+  //     { description: { $regex: keyword, $options: "i" } },
+  //   ],
   // });
 
-  // pagination
-  const { page } = req.query;
-  const limit = 2;
-  const skip = limit * (page - 1);
+  // ********** Filter ********* \\
+  // const products = await Product.find({ ...req.query });
 
-  const paginatedProducts = await Product.find().skip(skip).limit(limit);
+  // ********** Pagination ********* \\
+  // let { page } = req.query;
+  // page = !page || page < 1 || isNaN(page) ? 1 : page;
+  // const limit = 2;
+  // const skip = limit * (page - 1);
+  // const products = await Product.find().skip(skip).limit(limit);
 
-  // select
-  const { fields } = req.query;
-  // const selectedFields = await Product.find().select(fields);
+  // ********** Sort ********* \\
+  // const { sort } = req.query;
+  // const products = await Product.find().sort(sort);
 
-  // sort
-  const { sort } = req.query;
-  // const sortedProducts = await Product.find().sort(sort);
+  // ********** Selection ********* \\
+  // const { fields } = req.query;
 
-  return res.json({ success: true, results: paginatedProducts });
+  // // model keys
+  // const modelKeys = Object.keys(Product.schema.paths);
+  // console.log(modelKeys);
+
+  // // query keys
+  // const queryKeys = fields.split(" ");
+  // console.log(queryKeys);
+
+  // // matched keys
+  // const matchedKeys = queryKeys.filter((key) => modelKeys.includes(key));
+  // console.log(matchedKeys);
+
+  const products = await Product.find({ ...req.query })
+    .paginate(req.query.page)
+    .customSelect(req.query.fields)
+    .sort(req.query.sort);
+  return res.json({ success: true, results: products });
+});
+
+// single product
+export const singleProduct = asyncHandler(async (req, res, next) => {
+  const product = await Product.findById(req.params.productId);
+  if (!product) return next(new Error("Product not found"));
+
+  return res.json({ success: true, results: product });
 });

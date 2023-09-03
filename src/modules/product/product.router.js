@@ -7,10 +7,11 @@ import {
   allProducts,
   createProduct,
   deleteProduct,
+  singleProduct,
 } from "./product.controller.js";
-import { createProductSchema } from "./product.validation.js";
+import { ProductIdSchema, createProductSchema } from "./product.validation.js";
 
-const productRouter = Router();
+const productRouter = Router({ mergeParams: true });
 
 // create product
 productRouter.post(
@@ -30,10 +31,18 @@ productRouter.delete(
   "/:productId",
   isAuthenticated,
   isAuthorized("admin"),
+  isValid(ProductIdSchema),
   deleteProduct
 );
 
 // get all products
 productRouter.get("/", allProducts);
+
+// single product
+productRouter.get(
+  "/single/:productId",
+  isValid(ProductIdSchema),
+  singleProduct
+);
 
 export default productRouter;

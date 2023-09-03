@@ -21,6 +21,11 @@ const brandSchema = new Schema(
         required: true,
       },
     },
+    category: {
+      type: Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
     createdBy: {
       type: Types.ObjectId,
       ref: "User",

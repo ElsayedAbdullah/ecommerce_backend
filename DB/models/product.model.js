@@ -40,14 +40,17 @@ const productSchema = new Schema(
     category: {
       type: Types.ObjectId,
       ref: "Category",
+      required: true,
     },
     subcategory: {
       type: Types.ObjectId,
       ref: "Subcategory",
+      required: true,
     },
     brand: {
       type: Types.ObjectId,
       ref: "Brand",
+      required: true,
     },
     createdBy: {
       type: Types.ObjectId,
@@ -59,9 +62,15 @@ const productSchema = new Schema(
       unique: true,
     },
   },
-  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    strictQuery: true,
+  }
 );
 
+// virtuals
 // to calculate the final price with info about price and discount
 productSchema.virtual("finalPrice").get(function () {
   if (this.price) {
@@ -70,6 +79,26 @@ productSchema.virtual("finalPrice").get(function () {
     ).toFixed(2);
   }
 });
+
+// Query helper
+// pagination
+productSchema.query.paginate = function (page) {
+  page = !page || page < 1 || isNaN(page) ? 1 : page;
+  const limit = 2;
+  const skip = limit * (page - 1);
+  return this.skip(skip).limit(limit);
+};
+// custom select
+productSchema.query.customSelect = function (fields) {
+  if (!fields) return this;
+  // model keys
+  const modelKeys = Object.keys(Product.schema.paths);
+  // query keys
+  const queryKeys = fields.split(" ");
+  // matched keys
+  const matchedKeys = queryKeys.filter((key) => modelKeys.includes(key));
+  return this.select(matchedKeys);
+};
 
 // model
 export const Product =

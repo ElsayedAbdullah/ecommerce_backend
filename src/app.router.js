@@ -2,6 +2,7 @@ import connectDB from "../DB/connection.js";
 import authRouter from "./modules/auth/auth.router.js";
 import brandRouter from "./modules/brand/brand.router.js";
 import categoryRouter from "./modules/category/category.router.js";
+import couponRouter from "./modules/coupon/coupon.router.js";
 import productRouter from "./modules/product/product.router.js";
 import subcategoryRouter from "./modules/subcategory/subcategory.router.js";
 
@@ -24,6 +25,9 @@ const appRouter = (app, express) => {
 
   // product
   app.use("/product", productRouter);
+
+  // coupon
+  app.use("/coupon", couponRouter);
 
   // not found page router
   app.all("*", (req, res, next) => {

@@ -16,10 +16,12 @@ import { isAuthenticated } from "../../middleware/authentication.js";
 import { isAuthorized } from "../../middleware/authorization.js";
 import { fileUpload, filterObject } from "../../utils/multer.js";
 import subcategoryRouter from "../subcategory/subcategory.router.js";
+import productRouter from "../product/product.router.js";
 
 const categoryRouter = Router();
 
 categoryRouter.use("/:categoryId/subcategory", subcategoryRouter);
+categoryRouter.use("/:categoryId/products", productRouter);
 
 // create category
 categoryRouter.post(

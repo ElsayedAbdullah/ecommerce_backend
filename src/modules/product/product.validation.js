@@ -8,8 +8,14 @@ export const createProductSchema = joi
     availableItems: joi.number().min(1).required(),
     price: joi.number().min(1).required(),
     discount: joi.number().min(1).max(100),
-    category: joi.string().custom(validObjectId),
-    subcategory: joi.string().custom(validObjectId),
-    brand: joi.string().custom(validObjectId),
+    category: joi.string().custom(validObjectId).required(),
+    subcategory: joi.string().custom(validObjectId).required(),
+    brand: joi.string().custom(validObjectId).required(),
+  })
+  .required();
+
+export const ProductIdSchema = joi
+  .object({
+    productId: joi.string().custom(validObjectId).required(),
   })
   .required();

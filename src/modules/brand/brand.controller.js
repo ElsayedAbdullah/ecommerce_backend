@@ -2,11 +2,16 @@ import Brand from "../../../DB/models/brand.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import slugify from "slugify";
 import cloudinary from "../../utils/cloud.js";
+import Category from "../../../DB/models/category.model.js";
 
 // CRUD
 
 // Create brand
 export const createBrand = asyncHandler(async (req, res, next) => {
+  // check category
+  const category = await Category.findById(req.body.categoryId);
+  if (!category) return next(new Error("Category not found", { cause: 404 }));
+
   // file
   if (!req.file) return next(new Error("Brand image is required"));
   const { secure_url, public_id } = await cloudinary.uploader.upload(
@@ -18,6 +23,7 @@ export const createBrand = asyncHandler(async (req, res, next) => {
     name: req.body.name,
     slug: slugify(req.body.name),
     createdBy: req.user._id,
+    category: req.body.categoryId,
     image: {
       url: secure_url,
       id: public_id,
