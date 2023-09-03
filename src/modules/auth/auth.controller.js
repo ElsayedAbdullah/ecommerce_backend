@@ -7,6 +7,7 @@ import { sendEmail } from "../../utils/sendEmail.js";
 import { signupEmailTemp } from "../../utils/emailTemplate.js";
 import User from "../../../DB/models/user.model.js";
 import Token from "../../../DB/models/token.model.js";
+import { Cart } from "../../../DB/models/cart.model.js";
 
 // Register
 export const register = asyncHandler(async (req, res, next) => {
@@ -43,6 +44,9 @@ export const register = asyncHandler(async (req, res, next) => {
     subject: "Confirmation Email",
     html: signupEmailTemp(link),
   });
+
+  // create cart
+  await Cart.create({ user: user._id });
 
   // send response
   return isSent

@@ -100,6 +100,10 @@ productSchema.query.customSelect = function (fields) {
   return this.select(matchedKeys);
 };
 
+productSchema.methods.inStock = function (requiredQuantity) {
+  return this.availableItems > requiredQuantity ? true : false;
+};
+
 // model
 export const Product =
   mongoose.models.Product || model("Product", productSchema);
