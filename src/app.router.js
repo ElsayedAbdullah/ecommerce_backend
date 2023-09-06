@@ -10,7 +10,10 @@ import subcategoryRouter from "./modules/subcategory/subcategory.router.js";
 
 const appRouter = (app, express) => {
   // CORS
-  const whitelist = ["http://127.0.0.1:5500"];
+  const whitelist = [
+    "http://127.0.0.1:5500",
+    "https://ecommerce-backend-plum.vercel.app/",
+  ];
   app.use((req, res, next) => {
     // console.log(req.header("origin"));
 
