@@ -10,27 +10,27 @@ import subcategoryRouter from "./modules/subcategory/subcategory.router.js";
 
 const appRouter = (app, express) => {
   // CORS
-  // const whitelist = ["http://127.0.0.1:5500"];
-  // app.use((req, res, next) => {
-  //   // console.log(req.header("origin"));
+  const whitelist = ["http://127.0.0.1:5500"];
+  app.use((req, res, next) => {
+    // console.log(req.header("origin"));
 
-  //   // activate account api
-  //   if (req.originalUrl.includes("/auth/confirmEmail")) {
-  //     res.setHeader("Access-Control-Allow-Origin", "*");
-  //     res.setHeader("Access-Control-Allow-Methods", "GET");
-  //     return next();
-  //   }
+    // activate account api
+    if (req.originalUrl.includes("/auth/confirmEmail")) {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Methods", "GET");
+      return next();
+    }
 
-  //   if (!whitelist.includes(req.header("origin"))) {
-  //     return next(new Error("Blocked by CORS!"));
-  //   }
+    if (!whitelist.includes(req.header("origin"))) {
+      return next(new Error("Blocked by CORS!"));
+    }
 
-  //   res.setHeader("Access-Control-Allow-Origin", "*");
-  //   res.setHeader("Access-Control-Allow-Headers", "*");
-  //   res.setHeader("Access-Control-Allow-Methods", "*");
-  //   res.setHeader("Access-Control-Allow-Private-Network", true);
-  //   return next();
-  // });
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "*");
+    res.setHeader("Access-Control-Allow-Methods", "*");
+    res.setHeader("Access-Control-Allow-Private-Network", true);
+    return next();
+  });
 
   // Global middleware
   app.use(express.json());
