@@ -17,7 +17,10 @@ const orderSchema = new Schema(
         totalPrice: Number,
       },
     ],
-    invoice: String,
+    invoice: {
+      id: String,
+      url: String,
+    },
     address: {
       type: String,
       required: true,
@@ -40,6 +43,7 @@ const orderSchema = new Schema(
       },
     },
     status: {
+      type: String,
       enum: ["placed", "shipped", "delivered", "cancelled", "refunded"],
       default: "placed",
     },
@@ -49,7 +53,17 @@ const orderSchema = new Schema(
       default: "cash",
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
+
+// virtuals
+// to calculate the final price with info about price and discount
+orderSchema.virtual("finalPrice").get(function () {
+  return this.coupon
+    ? Number.parseFloat(
+        this.price - (this.price * this.coupon.discount) / 100
+      ).toFixed(2)
+    : this.price;
+});
 
 export const Order = mongoose.models.Order || model("Order", orderSchema);

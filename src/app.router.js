@@ -4,10 +4,34 @@ import brandRouter from "./modules/brand/brand.router.js";
 import cartRouter from "./modules/cart/cart.router.js";
 import categoryRouter from "./modules/category/category.router.js";
 import couponRouter from "./modules/coupon/coupon.router.js";
+import orderRouter from "./modules/order/order.router.js";
 import productRouter from "./modules/product/product.router.js";
 import subcategoryRouter from "./modules/subcategory/subcategory.router.js";
 
 const appRouter = (app, express) => {
+  // CORS
+  // const whitelist = ["http://127.0.0.1:5500"];
+  // app.use((req, res, next) => {
+  //   // console.log(req.header("origin"));
+
+  //   // activate account api
+  //   if (req.originalUrl.includes("/auth/confirmEmail")) {
+  //     res.setHeader("Access-Control-Allow-Origin", "*");
+  //     res.setHeader("Access-Control-Allow-Methods", "GET");
+  //     return next();
+  //   }
+
+  //   if (!whitelist.includes(req.header("origin"))) {
+  //     return next(new Error("Blocked by CORS!"));
+  //   }
+
+  //   res.setHeader("Access-Control-Allow-Origin", "*");
+  //   res.setHeader("Access-Control-Allow-Headers", "*");
+  //   res.setHeader("Access-Control-Allow-Methods", "*");
+  //   res.setHeader("Access-Control-Allow-Private-Network", true);
+  //   return next();
+  // });
+
   // Global middleware
   app.use(express.json());
 
@@ -32,6 +56,9 @@ const appRouter = (app, express) => {
 
   // cart
   app.use("/cart", cartRouter);
+
+  // order
+  app.use("/order", orderRouter);
 
   // not found page router
   app.all("*", (req, res, next) => {

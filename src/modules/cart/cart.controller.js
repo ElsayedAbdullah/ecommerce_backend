@@ -12,23 +12,23 @@ export const addToCart = asyncHandler(async (req, res, next) => {
   if (!productId) return next(new Error("Product not found", { cause: 404 }));
 
   // check stock
-  // if (quantity > product.availableItems) {
-  //   return next(
-  //     new Error(
-  //       `Sorry, only ${product.availableItems} items are left on the stock`
-  //     )
-  //   );
-  // }
-
-  // another method to check stock
-  // [inStock] is a method in product schema
-  if (!product.inStock(quantity)) {
+  if (quantity > product.availableItems) {
     return next(
       new Error(
         `Sorry, only ${product.availableItems} items are left on the stock`
       )
     );
   }
+
+  // another method to check stock
+  // [inStock] is a method in product schema
+  // if (!product.inStock(quantity)) {
+  //   return next(
+  //     new Error(
+  //       `Sorry, only ${product.availableItems} items are left on the stock`
+  //     )
+  //   );
+  // }
 
   // check if product is in cart
   const isProductInCart = await Cart.findOne({
@@ -37,9 +37,12 @@ export const addToCart = asyncHandler(async (req, res, next) => {
   });
 
   if (isProductInCart) {
-    isProductInCart.products.forEach((product) => {
-      if (product.productId.toString() === productId.toString()) {
-        product.quantity = quantity;
+    isProductInCart.products.forEach((prod) => {
+      if (
+        prod.productId.toString() === productId.toString() &&
+        prod.quantity + quantity <= product.availableItems
+      ) {
+        prod.quantity += quantity;
       }
     });
     await isProductInCart.save();

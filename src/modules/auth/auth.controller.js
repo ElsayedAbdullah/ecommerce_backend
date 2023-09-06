@@ -45,9 +45,6 @@ export const register = asyncHandler(async (req, res, next) => {
     html: signupEmailTemp(link),
   });
 
-  // create cart
-  await Cart.create({ user: user._id });
-
   // send response
   return isSent
     ? res.json({ success: true, message: "please review your email" })
@@ -67,6 +64,7 @@ export const confirmEmail = asyncHandler(async (req, res, next) => {
   if (!user) return next(new Error("user not found!"), { cause: 404 });
 
   // create a cart
+  await Cart.create({ user: user._id });
 
   // send response
   return res.json({
