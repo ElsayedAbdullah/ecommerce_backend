@@ -5,13 +5,13 @@ import { Product } from "../../../DB/models/product.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import cloudinary from "../../utils/cloud.js";
 import { createInvoice } from "../../utils/createInvoice.js";
+import fsExtra from "fs-extra";
 
 // to the get the value of __dirname
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import { sendEmail } from "../../utils/sendEmail.js";
 import { clearCart, updateStock } from "./order.service.js";
-import { nanoid } from "nanoid";
 import Stripe from "stripe";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -101,15 +101,14 @@ export const createOrder = asyncHandler(async (req, res, next) => {
   createInvoice(invoice, pdfPath);
 
   // upload invoice to cloudinary
-  // const { secure_url, public_id } = await cloudinary.uploader.upload(pdfPath, {
-  //   folder: `${process.env.FOLDER_CLOUD_NAME}/order/invoice/${user._id}`,
-  // });
+  const { secure_url, public_id } = await cloudinary.uploader.upload(pdfPath, {
+    folder: `${process.env.FOLDER_CLOUD_NAME}/order/invoice/${user._id}`,
+  });
 
   // // add invoice to order
-  order.invoice = { id: nanoid(), url: pdfPath };
+  // order.invoice = { id: nanoid(), url: pdfPath }; // local
+  order.invoice = { id: public_id, url: secure_url }; // cloudinary
   await order.save();
-
-  // TODO delete file from file system
 
   // send email
   const isSent = await sendEmail({
@@ -117,7 +116,7 @@ export const createOrder = asyncHandler(async (req, res, next) => {
     subject: "Order Invoice",
     attachments: [
       {
-        path: pdfPath,
+        path: secure_url,
         contentType: "application/pdf",
       },
     ],
@@ -129,6 +128,10 @@ export const createOrder = asyncHandler(async (req, res, next) => {
     // clear cart
     clearCart(user._id);
   }
+
+  // TODO delete files from invoiceTemp using file system
+  let dir = "./invoiceTemp";
+  await fsExtra.emptyDir(dir);
 
   // Stripe Payment
   if (payment === "visa") {
@@ -160,7 +163,8 @@ export const createOrder = asyncHandler(async (req, res, next) => {
           quantity: product.quantity,
         };
       }),
-      discounts: existCoupon ? [{ coupon: existCoupon.id }] : [],
+      // discounts: existCoupon ? [{ coupon: existCoupon.id }] : [],
+      ...(existCoupon ? [{ discounts: [{ coupon: existCoupon.id }] }] : []), // to put the discounts only if there is existCoupon
     });
 
     return res.json({ success: true, results: session.url });

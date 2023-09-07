@@ -8,6 +8,7 @@ import orderRouter from "./modules/order/order.router.js";
 import productRouter from "./modules/product/product.router.js";
 import subcategoryRouter from "./modules/subcategory/subcategory.router.js";
 import cors from "cors";
+
 const appRouter = (app, express) => {
   // CORS
   app.use(cors());
