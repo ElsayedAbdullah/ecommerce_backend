@@ -217,9 +217,9 @@ export const orderWebhook = asyncHandler(async (request, response) => {
   console.log(orderId);
   if (event.type === "checkout.session.completed") {
     // change order status
-    await Order.findByIdAndUpdate(orderId, { status: "Paid" });
-    return response.send();
+    await Order.findOneAndUpdate({ _id: orderId }, { status: "Paid" });
+    return;
   }
-  await Order.findByIdAndUpdate(orderId, { status: "Failed to pay" });
-  return response.send();
+  await Order.findOneAndUpdate({ _id: orderId }, { status: "Failed to pay" });
+  return;
 });
