@@ -1,8 +1,9 @@
+import express from "express";
 import { Router } from "express";
 import { isAuthenticated } from "../../middleware/authentication.js";
 import { isValid } from "../../middleware/validation.js";
 import { cancelOrderSchema, createOrderSchema } from "./order.validation.js";
-import { cancelOrder, createOrder } from "./order.controller.js";
+import { cancelOrder, createOrder, orderWebhook } from "./order.controller.js";
 
 const orderRouter = Router();
 
@@ -16,4 +17,11 @@ orderRouter.patch(
   isValid(cancelOrderSchema),
   cancelOrder
 );
+
+// webhook
+orderRouter.post(
+  "/webhook",
+  express.raw({ type: "application/json" }, orderWebhook)
+);
+
 export default orderRouter;
