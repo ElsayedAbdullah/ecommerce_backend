@@ -39,7 +39,9 @@ const appRouter = (app, express) => {
 
   // Global middleware
   app.use((req, res, next) => {
-    if (req.originalUrl === "/order/webhook") return next();
+    if (req.originalUrl === "/order/webhook") {
+      return next();
+    }
     express.json()(req, res, next);
   });
 
