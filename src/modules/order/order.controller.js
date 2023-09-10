@@ -235,6 +235,7 @@ import path from "path";
 import Stripe from "stripe";
 import { sendEmail } from "../../utils/sendEmail.js";
 import { createInvoice } from "../../utils/createInvoice.js";
+import { nanoid } from "nanoid";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -314,17 +315,18 @@ export const createOrder = asyncHandler(async (req, res, next) => {
 
   const pdfPath = path.join(
     __dirname,
-    `./../../../tempInvoices/${order._id}.pdf`
+    `./../../../invoiceTemp/${order._id}.pdf`
   );
   createInvoice(invoice, pdfPath);
 
   // upload invoice cloudinary
-  const { secure_url, public_id } = await cloudinary.uploader.upload(pdfPath, {
-    folder: `${process.env.FOLDER_CLOUD_NAME}/order/invoices`,
-  });
+  // const { secure_url, public_id } = await cloudinary.uploader.upload(pdfPath, {
+  //   folder: `${process.env.FOLDER_CLOUD_NAME}/order/invoices`,
+  // });
 
   // update order
-  order.invoice = { url: secure_url, id: public_id };
+  // order.invoice = { url: secure_url, id: public_id };
+  order.invoice = { id: nanoid(), url: pdfPath }; // local
   await order.save();
   ///////////////////////done///////////////////////////////
 
@@ -335,7 +337,7 @@ export const createOrder = asyncHandler(async (req, res, next) => {
     attachments: [
       {
         // utf-8 string as an attachment
-        path: secure_url,
+        path: pdfPath,
         contentType: "application/pdf",
       },
     ],
