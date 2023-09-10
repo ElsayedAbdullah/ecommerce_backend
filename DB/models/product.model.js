@@ -101,7 +101,7 @@ productSchema.query.customSelect = function (fields) {
 };
 
 productSchema.methods.inStock = function (requiredQuantity) {
-  return this.availableItems > requiredQuantity ? true : false;
+  return this.availableItems >= requiredQuantity ? true : false;
 };
 
 // model

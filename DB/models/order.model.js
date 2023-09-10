@@ -67,7 +67,7 @@ const orderSchema = new Schema(
 // virtuals
 // to calculate the final price with info about price and discount
 orderSchema.virtual("finalPrice").get(function () {
-  return this.coupon
+  return this.coupon?.discount
     ? Number.parseFloat(
         this.price - (this.price * this.coupon.discount) / 100
       ).toFixed(2)

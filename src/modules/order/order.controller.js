@@ -13,6 +13,7 @@ import { fileURLToPath } from "url";
 import { sendEmail } from "../../utils/sendEmail.js";
 import { clearCart, updateStock } from "./order.service.js";
 import Stripe from "stripe";
+import { nanoid } from "nanoid";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // create order
@@ -131,8 +132,8 @@ export const createOrder = asyncHandler(async (req, res, next) => {
   }
 
   // TODO delete files from invoiceTemp using file system
-  let dir = "./invoiceTemp";
-  await fsExtra.emptyDir(dir);
+  // let dir = "./invoiceTemp";
+  // await fsExtra.emptyDir(dir);
 
   // Stripe Payment
   if (payment === "visa") {
@@ -213,14 +214,12 @@ export const orderWebhook = asyncHandler(async (request, response) => {
   }
 
   const orderId = event.data.object.metadata.order_id;
+  console.log(orderId);
   if (event.type === "checkout.session.completed") {
     // change order status
     await Order.findByIdAndUpdate(orderId, { status: "Paid" });
-    return;
+    return response.send();
   }
   await Order.findByIdAndUpdate(orderId, { status: "Failed to pay" });
-  return;
-
-  // Return a 200 response to acknowledge receipt of the event
-  response.send();
+  return response.send();
 });
