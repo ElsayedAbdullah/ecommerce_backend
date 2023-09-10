@@ -101,13 +101,13 @@ export const createOrder = asyncHandler(async (req, res, next) => {
   createInvoice(invoice, pdfPath);
 
   // upload invoice to cloudinary
-  const { secure_url, public_id } = await cloudinary.uploader.upload(pdfPath, {
-    folder: `${process.env.FOLDER_CLOUD_NAME}/order/invoice/${user._id}`,
-  });
+  // const { secure_url, public_id } = await cloudinary.uploader.upload(pdfPath, {
+  //   folder: `${process.env.FOLDER_CLOUD_NAME}/order/invoice/${user._id}`,
+  // });
 
   // // add invoice to order
-  // order.invoice = { id: nanoid(), url: pdfPath }; // local
-  order.invoice = { id: public_id, url: secure_url }; // cloudinary
+  order.invoice = { id: nanoid(), url: pdfPath }; // local
+  // order.invoice = { id: public_id, url: secure_url }; // cloudinary
   await order.save();
 
   // send email
@@ -116,7 +116,8 @@ export const createOrder = asyncHandler(async (req, res, next) => {
     subject: "Order Invoice",
     attachments: [
       {
-        path: secure_url,
+        path: pdfPath, // local
+        // path: secure_url, // cloudinary
         contentType: "application/pdf",
       },
     ],
